@@ -67,7 +67,9 @@ const Description = styled.p`
 
 const StyledSearchEngine = () => {
   const [query, setQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([{title: "Google", description: "Search engine", url: "www.google.com"}]);
+  //state to hide autocomplete smoother
+  const [showAutoComplete, setShowAutoComplete] = useState(true);
+  const [searchResults, setSearchResults] = useState([]);
   const [autocompleteResults, setAutocompleteResults] = useState([]);
   const [searchHistory, setSearchHistory] = useState([]);
 
@@ -78,16 +80,12 @@ const StyledSearchEngine = () => {
         query
       }
     }).then(res => {
-      console.log(res.data);
-      const result = res.data;
-      // const autocompleteResults = result
-      //   .slice(0, 10);
-
-      setAutocompleteResults(res.data);
+      setAutocompleteResults(res.data.slice(0,10));
     })
   }, [query]);
 
   const handleInputChange = (event) => {
+    setShowAutoComplete(true);
     setQuery(event.target.value);
   };
 
@@ -96,7 +94,15 @@ const StyledSearchEngine = () => {
   };
 
   const handleAutocompleteClick = (query) => {
-    setQuery(query);
+    setShowAutoComplete(false);
+    axios.get("http://localhost:3000/api/search-title",{
+      params: {
+        query
+      }
+    }).then(res => {
+      setQuery("");
+      setSearchResults(res.data);
+    })
   };
 
   const removeItemFromHistory = (item) => {
@@ -112,7 +118,7 @@ const StyledSearchEngine = () => {
         onChange={handleInputChange}
         autoFocus
       />
-      {autocompleteResults.length > 0 && (
+      {showAutoComplete && autocompleteResults.length > 0 && (
         <AutocompleteList>
           {autocompleteResults.map((item, index) => (
             <AutocompleteItem key={index} onClick={() => handleAutocompleteClick(item.title)}>
