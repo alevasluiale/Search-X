@@ -112,7 +112,7 @@ const StyledSearchEngine = () => {
   return (
     <SearchContainer>
       <Input
-        type="text"
+        type="search"
         placeholder="Search..."
         value={query}
         onChange={handleInputChange}
@@ -123,8 +123,8 @@ const StyledSearchEngine = () => {
           {autocompleteResults.map((item, index) => (
             <AutocompleteItem key={index} onClick={() => handleAutocompleteClick(item.title)}>
               {item.title}
-              {searchHistory.includes(item.title) && (
-                <RemoveButton onClick={() => removeItemFromHistory(item.title)}>Remove</RemoveButton>
+              {item.visited && (
+                <RemoveButton onClick={() => removeItemFromHistory(item.id)}>Remove</RemoveButton>
               )}
             </AutocompleteItem>
           ))}

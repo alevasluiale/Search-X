@@ -35,7 +35,7 @@ app.get('/api/search-title', (req, res) => {
   if(!query) res.json([]);
   else {
     const sql = 'SELECT * FROM items WHERE title LIKE ?';
-    db.all(sql, [`%${query}%`], (err, rows) => {
+    db.all(sql, [`${query}%`], (err, rows) => {
       if (err) {
         return res.status(500).json({error: err.message});
       }
