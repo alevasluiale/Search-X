@@ -1,19 +1,21 @@
 import styled from 'styled-components';
 import {useEffect, useState} from "react";
+import axios from "axios";
 
 const SearchContainer = styled.div`
   display: flex;
   flex-direction: column;
   max-width: 600px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 20px 20px;
   border: 1px solid #ccc;
   border-radius: 5px;
   background: #fff;
+  height: 20%;
+  width: 50%;
 `;
 
 const Input = styled.input`
-  width: 100%;
   padding: 10px;
   font-size: 16px;
   border: 1px solid #ccc;
@@ -65,22 +67,24 @@ const Description = styled.p`
 
 const StyledSearchEngine = () => {
   const [query, setQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState([{title: "Google", description: "Search engine", url: "www.google.com"}]);
   const [autocompleteResults, setAutocompleteResults] = useState([]);
   const [searchHistory, setSearchHistory] = useState([]);
 
   useEffect(() => {
-    const localDB = [
-      { title: 'Example Result 1', description: 'Description for Result 1', url: 'https://example.com/result1' },
-      { title: 'Example Result 2', description: 'Description for Result 2', url: 'https://example.com/result2' },
-    ];
 
-    // Simulate autocomplete functionality.
-    const autocompleteResults = localDB
-      .filter(item => item.title.toLowerCase().startsWith(query.toLowerCase()))
-      .slice(0, 10);
+    axios.get("http://localhost:3000/api/search-title",{
+      params: {
+        query
+      }
+    }).then(res => {
+      console.log(res.data);
+      const result = res.data;
+      // const autocompleteResults = result
+      //   .slice(0, 10);
 
-    setAutocompleteResults(autocompleteResults);
+      setAutocompleteResults(res.data);
+    })
   }, [query]);
 
   const handleInputChange = (event) => {
@@ -88,7 +92,7 @@ const StyledSearchEngine = () => {
   };
 
   const handleResultClick = (url) => {
-
+    console.log(url)
   };
 
   const handleAutocompleteClick = (query) => {

@@ -29,6 +29,34 @@ app.get('/api/search-results', (req, res) => {
   });
 });
 
+// Endpoint to search by title (full-text search)
+app.get('/api/search-title', (req, res) => {
+  const { query } = req.query;
+  if(!query) res.json([]);
+  else {
+    const sql = 'SELECT * FROM search_results WHERE title LIKE ?';
+    db.all(sql, [`%${query}%`], (err, rows) => {
+      if (err) {
+        return res.status(500).json({error: err.message});
+      }
+      res.json(rows);
+    });
+  }
+});
+
+// Endpoint to perform a full-text search on title, description, and URL
+app.get('/api/search', (req, res) => {
+  const { query } = req.body;
+  const sql = `SELECT * FROM search_results WHERE title LIKE ? OR description LIKE ? OR url LIKE ?`;
+  const searchQuery = `%${query}%`;
+  db.all(sql, [searchQuery], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(rows);
+  });
+});
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
