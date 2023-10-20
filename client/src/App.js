@@ -1,5 +1,4 @@
 import './App.css';
-import SearchEngine from "./SearchEngine";
 import StyledSearchEngine from "./StyledSearchEngine";
 
 function App() {

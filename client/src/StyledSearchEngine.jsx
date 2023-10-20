@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import {useEffect, useState} from "react";
-import axios from "axios";
+import API from "./api";
 
 const SearchContainer = styled.div`
   display: flex;
@@ -96,7 +96,7 @@ const StyledSearchEngine = () => {
   };
 
   const fetchAutoComplete = () => {
-    axios.get("http://localhost:3000/api/search-title",{
+    API.get("/api/search-title",{
       params: {
         query
       }
@@ -111,7 +111,7 @@ const StyledSearchEngine = () => {
 
   const fetchResults = (query) => {
     setShowAutoComplete(false);
-    axios.get("http://localhost:3000/api/search-title",{
+    API.get("/api/search-title",{
       params: {
         query
       }
@@ -122,7 +122,7 @@ const StyledSearchEngine = () => {
 
 
   const updateVisited = (id,visited) => {
-    axios.post("http://localhost:3000/api/update-visited",{
+    API.post("/api/update-visited",{
       id,
       visited: visited ? 1 : 0
     }).then(() => {

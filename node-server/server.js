@@ -1,6 +1,5 @@
-// server.js
 const express = require('express');
-const db = require('./db'); // Import the database configuration
+const db = require('./db');
 const app = express();
 const port = 3000;
 
