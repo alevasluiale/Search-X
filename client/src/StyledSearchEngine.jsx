@@ -74,6 +74,7 @@ const StyledSearchEngine = () => {
   const [showAutoComplete, setShowAutoComplete] = useState(true);
   const [searchResults, setSearchResults] = useState([]);
   const [autocompleteResults, setAutocompleteResults] = useState([]);
+  const [duration,setDuration] = useState(0);
 
   useEffect(() => {
     fetchAutoComplete();
@@ -105,10 +106,6 @@ const StyledSearchEngine = () => {
     })
   }
 
-  useEffect(() => {
-    console.log(autocompleteResults);
-  },[autocompleteResults])
-
   const fetchResults = (query) => {
     setShowAutoComplete(false);
     API.get("/api/search-title",{
@@ -116,6 +113,7 @@ const StyledSearchEngine = () => {
         query
       }
     }).then(res => {
+      setDuration(res.duration);
       setSearchResults(res.data);
     })
   }
@@ -170,8 +168,11 @@ const StyledSearchEngine = () => {
         </AutocompleteList>
       )}
       {searchResults.length > 0 && (
-        <div className="search-results">
-          <ResultMeta>Found {searchResults.length} results.</ResultMeta>
+        <div style={{marginTop: "10px"}}>
+          <div style={{display: "flex", justifyContent: "space-between"}}>
+            <ResultMeta>Found {searchResults.length} results.</ResultMeta>
+            <ResultMeta>{duration} Milliseconds</ResultMeta>
+          </div>
           <ul>
             {searchResults.map((item, index) => (
               <SearchResult key={index}>
