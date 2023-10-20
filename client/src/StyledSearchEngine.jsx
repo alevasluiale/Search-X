@@ -31,7 +31,10 @@ const AutocompleteList = styled.ul`
 `;
 
 const AutocompleteItem = styled.li`
+  display: flex;
+  justify-content: space-between;
   cursor: pointer;
+  color: ${(props) => (props.visited ? 'darkblue' : 'black')};
   padding: 10px;
   &:hover {
     background: #f0f0f0;
@@ -71,17 +74,9 @@ const StyledSearchEngine = () => {
   const [showAutoComplete, setShowAutoComplete] = useState(true);
   const [searchResults, setSearchResults] = useState([]);
   const [autocompleteResults, setAutocompleteResults] = useState([]);
-  const [searchHistory, setSearchHistory] = useState([]);
 
   useEffect(() => {
-
-    axios.get("http://localhost:3000/api/search-title",{
-      params: {
-        query
-      }
-    }).then(res => {
-      setAutocompleteResults(res.data.slice(0,10));
-    })
+    fetchAutoComplete();
   }, [query]);
 
   const handleInputChange = (event) => {
@@ -93,21 +88,57 @@ const StyledSearchEngine = () => {
     console.log(url)
   };
 
-  const handleAutocompleteClick = (query) => {
+  const handleAutocompleteClick = (query,id) => {
+    setQuery(query);
+    setShowAutoComplete(false);
+    fetchResults(query);
+    updateVisited(id,true);
+  };
+
+  const fetchAutoComplete = () => {
+    axios.get("http://localhost:3000/api/search-title",{
+      params: {
+        query
+      }
+    }).then(res => {
+      setAutocompleteResults(res.data.slice(0,10));
+    })
+  }
+
+  useEffect(() => {
+    console.log(autocompleteResults);
+  },[autocompleteResults])
+
+  const fetchResults = (query) => {
     setShowAutoComplete(false);
     axios.get("http://localhost:3000/api/search-title",{
       params: {
         query
       }
     }).then(res => {
-      setQuery("");
       setSearchResults(res.data);
     })
+  }
+
+
+  const updateVisited = (id,visited) => {
+    axios.post("http://localhost:3000/api/update-visited",{
+      id,
+      visited: visited ? 1 : 0
+    }).then(() => {
+      fetchAutoComplete();
+    })
+  }
+
+  const removeItemFromHistory = (id) => {
+      updateVisited(id, false);
   };
 
-  const removeItemFromHistory = (item) => {
-
-  };
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      fetchResults(query);
+    }
+  }
 
   return (
     <SearchContainer>
@@ -117,14 +148,22 @@ const StyledSearchEngine = () => {
         value={query}
         onChange={handleInputChange}
         autoFocus
+        onKeyPress={handleKeyPress}
       />
       {showAutoComplete && autocompleteResults.length > 0 && (
         <AutocompleteList>
           {autocompleteResults.map((item, index) => (
-            <AutocompleteItem key={index} onClick={() => handleAutocompleteClick(item.title)}>
+            <AutocompleteItem visited={item.visited} key={index} onClick={() => handleAutocompleteClick(item.title,item.id)}>
               {item.title}
-              {item.visited && (
-                <RemoveButton onClick={() => removeItemFromHistory(item.id)}>Remove</RemoveButton>
+              {item.visited > 0 && (
+                <RemoveButton
+                  onClick={(ev) => {
+                    ev.stopPropagation();
+                    removeItemFromHistory(item.id)
+                  }}
+                >
+                  Remove
+                </RemoveButton>
               )}
             </AutocompleteItem>
           ))}
